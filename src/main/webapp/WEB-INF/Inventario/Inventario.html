@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinguino Feliz S.A</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            background-color: #343a40;
+            padding-top: 50px;
+            transition: all 0.3s;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 1.1em;
+            color: #ccc;
+            display: block;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            color: #fff;
+            background-color: #575757;
+        }
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+        #main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+        .collapsed + #main-content {
+            margin-left: 0;
+        }
+        .navbar{
+			position: fixed;
+		    top: 0;
+		    width: 100%;
+		    z-index: 1000;
+		}
+		 .editable {
+            display: none;
+        }
+        .edit-mode .editable {
+            display: block;
+        }
+        .edit-mode .non-editable {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+	<div>
+		<nav class="navbar bg-dark">
+		    <button class="btn btn-dark" id="sidebarToggle" data-expanded="true">
+				<i id="icon_sidebar" class="bi-x-lg"></i>
+			</button>
+		</nav>
+	</div>
+	<div>
+		<div class="sidebar bg-dark" id="sidebar">
+	        <ul class="nav flex-column">
+	            <li class="nav-item">
+	                <a class="nav-link active" href="/SistemaInventarioADS/Inventario/Home"><i class="bi bi-house-door"></i> Inicio</a>
+	            </li>
+	            <li class="nav-item">
+	                <a class="nav-link" href="/SistemaInventarioADS/Inventario/Inventario"><i class="bi bi-pencil-square"></i> Inventario</a>
+	            </li>
+	            <li class="nav-item">
+	                <a class="nav-link" href="/SistemaInventarioADS/Inventario/RegistroProductos"><i class="bi bi-box"></i> Productos</a>
+	            </li>
+	            <li class="nav-item">
+	                <a class="nav-link" href="/SistemaInventarioADS/Inventario/RegistroCategorias"><i class="bi bi-microsoft"></i> Categorias</a>
+	            </li>		  
+	        </ul>
+	    </div>
+	    <div class="main-content" id="main-content">
+	        <div class="container mt-5">
+		        <h1 class="mb-4">Mantenimiento de Productos</h1>
+		        <table class="table table-bordered">
+		            <thead>
+		                <tr>
+		                    <th>ID</th>
+		                    <th>Nombre</th>
+		                    <th>Descripción</th>
+		                    <th>Precio</th>
+		                    <th>Existencia</th>
+		                    <th>Estado</th>
+		                    <th>Acciones</th>
+		                </tr>
+		            </thead>
+		            <tbody id="productos-table">
+		                <!-- Los datos de los productos deberían ser renderizados dinámicamente aquí -->
+		            </tbody>
+		        </table>
+		    </div>
+	    </div>
+	</div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+		 /*<![CDATA[*/
+        // JavaScript code to generate the charts (dummy data)
+        const ventasPromedioCtx = document.getElementById('ventasPromedioChart').getContext('2d');
+        const ventasPromedioChart = new Chart(ventasPromedioCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [
+                    {
+                        label: 'Carros Control Remoto',
+                        data: [12, 19, 3, 5, 2],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false
+                    },
+                    {
+                        label: 'Peluches',
+                        data: [2, 3, 20, 5, 1],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false
+                    },
+                    {
+                        label: 'Muñecas',
+                        data: [3, 10, 13, 15, 22],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false
+                    },
+                    {
+                        label: 'Patines',
+                        data: [10, 20, 15, 3, 7],
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        fill: false
+                    }
+                ]
+            }
+        });
+
+        const categoriasPopularesCtx = document.getElementById('categoriasPopularesChart').getContext('2d');
+        const categoriasPopularesChart = new Chart(categoriasPopularesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Control Remoto', 'Lucha', 'Series Animadas'],
+                datasets: [{
+                    data: [10, 20, 30],
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1
+                }]
+            }
+        });
+        
+        $(document).ready(function () {
+			
+			const productos = [
+                { id: 1, nombre: 'Producto 1', descripcion: 'Descripción 1', precio: 10.0, existencia: 100, estado: 'activo' },
+                { id: 2, nombre: 'Producto 2', descripcion: 'Descripción 2', precio: 20.0, existencia: 200, estado: 'inactivo' }
+            ];
+
+            const renderProductos = () => {
+                const tbody = $('#productos-table');
+                tbody.empty();
+                productos.forEach(producto => {
+                    tbody.append(`
+                        <tr data-id="${producto.id}">
+                            <td>${producto.id}</td>
+                            <td>
+                                <span class="non-editable">${producto.nombre}</span>
+                                <input type="text" class="form-control editable" value="${producto.nombre}">
+                            </td>
+                            <td>
+                                <span class="non-editable">${producto.descripcion}</span>
+                                <input type="text" class="form-control editable" value="${producto.descripcion}">
+                            </td>
+                            <td>
+                                <span class="non-editable">${producto.precio}</span>
+                                <input type="number" class="form-control editable" value="${producto.precio}">
+                            </td>
+                            <td>
+                                <span class="non-editable">${producto.existencia}</span>
+                                <input type="number" class="form-control editable" value="${producto.existencia}">
+                            </td>
+                            <td>
+                                <span class="non-editable">${producto.estado}</span>
+                                <select class="form-select editable">
+                                    <option value="activo" ${producto.estado === 'activo' ? 'selected' : ''}>Activo</option>
+                                    <option value="inactivo" ${producto.estado === 'inactivo' ? 'selected' : ''}>Inactivo</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-warning btn-sm edit-btn non-editable">Editar</button>
+                                <button class="btn btn-success btn-sm save-btn editable">Guardar</button>
+                                <button class="btn btn-danger btn-sm cancel-btn editable">Cancelar</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                $('.edit-btn').click(function() {
+                    const tr = $(this).closest('tr');
+                    tr.addClass('edit-mode');
+                });
+
+                $('.cancel-btn').click(function() {
+                    const tr = $(this).closest('tr');
+                    tr.removeClass('edit-mode');
+                });
+
+                $('.save-btn').click(function() {
+                    const tr = $(this).closest('tr');
+                    const id = tr.data('id');
+                    const nombre = tr.find('input[type="text"]').eq(0).val();
+                    const descripcion = tr.find('input[type="text"]').eq(1).val();
+                    const precio = tr.find('input[type="number"]').eq(0).val();
+                    const existencia = tr.find('input[type="number"]').eq(1).val();
+                    const estado = tr.find('select').val();
+
+                    const producto = productos.find(p => p.id === id);
+                    producto.nombre = nombre;
+                    producto.descripcion = descripcion;
+                    producto.precio = parseFloat(precio);
+                    producto.existencia = parseInt(existencia);
+                    producto.estado = estado;
+
+                    renderProductos();
+                });
+            };
+
+            renderProductos();
+			
+            $('#sidebarToggle').on('click', function () {
+				
+				let expandedData=$(this).attr("data-expanded");
+				let expanded = (expandedData=="true") ? false : true;
+				
+				$(this).attr("data-expanded", expanded);
+				(expanded) ? $("#icon_sidebar").addClass("bi-x-lg").removeClass("bi-list") : 
+					$("#icon_sidebar").removeClass("bi-x-lg").addClass("bi-list");
+				
+                $('#sidebar').toggleClass('collapsed');
+                $('#main-content').toggleClass('collapsed');
+            });
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

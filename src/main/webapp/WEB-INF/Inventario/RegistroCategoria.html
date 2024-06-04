@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinguino Feliz S.A</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            background-color: #343a40;
+            padding-top: 50px;
+            transition: all 0.3s;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 1.1em;
+            color: #ccc;
+            display: block;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            color: #fff;
+            background-color: #575757;
+        }
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+        #main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+        .collapsed + #main-content {
+            margin-left: 0;
+        }
+        .navbar{
+			position: fixed;
+		    top: 0;
+		    width: 100%;
+		    z-index: 1000;
+		}
+    </style>
+</head>
+<body>
+	<div>
+		<nav class="navbar bg-dark">
+		    <button class="btn btn-dark" id="sidebarToggle" data-expanded="true">
+				<i id="icon_sidebar" class="bi-x-lg"></i>
+			</button>
+		</nav>
+	</div>
+	<div>
+		<div class="sidebar bg-dark" id="sidebar">
+	        <ul class="nav flex-column">
+	            <li class="nav-item">
+	                <a class="nav-link active" href="/SistemaInventarioADS/Inventario/Home"><i class="bi bi-house-door"></i> Inicio</a>
+	            </li>
+	            <li class="nav-item">
+	                <a class="nav-link" href="/SistemaInventarioADS/Inventario/Inventario"><i class="bi bi-pencil-square"></i> Inventario</a>
+	            </li>
+	            <li class="nav-item">
+	                <a class="nav-link" href="/SistemaInventarioADS/Inventario/RegistroProductos"><i class="bi bi-box"></i> Productos</a>
+	            </li>
+	            <li class="nav-item">
+	                <a class="nav-link" href="/SistemaInventarioADS/Inventario/RegistroCategorias"><i class="bi bi-microsoft"></i> Categorias</a>
+	            </li>	  
+	        </ul>
+	    </div>
+	    <div class="main-content" id="main-content">
+	        <div class="container mt-5">
+		        <h1 class="mb-4">Registro de Categorías</h1>
+		        <form th:action="@{/categoria/guardar}" method="post">
+		            <div class="mb-3">
+		                <label for="nombre" class="form-label">Nombre</label>
+		                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese el nombre de la categoría" required>
+		            </div>
+		            <div class="mb-3">
+		                <label for="descripcion" class="form-label">Descripción</label>
+		                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Ingrese la descripción de la categoría" required></textarea>
+		            </div>
+		            <div class="mb-3">
+		                <label for="habilitado" class="form-label">Habilitado</label>
+		                <select class="form-select" id="habilitado" name="habilitado" required>
+		                    <option value="true">Sí</option>
+		                    <option value="false">No</option>
+		                </select>
+		            </div>
+		            <button type="submit" class="btn btn-primary">Registrar Categoría</button>
+		        </form>
+		    </div>
+	    </div>
+	</div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script th:inline="javascript">
+		 /*<![CDATA[*/
+        
+        $(document).ready(function () {
+			
+            $('#sidebarToggle').on('click', function () {
+				
+				let expandedData=$(this).attr("data-expanded");
+				let expanded = (expandedData=="true") ? false : true;
+				
+				$(this).attr("data-expanded", expanded);
+				(expanded) ? $("#icon_sidebar").addClass("bi-x-lg").removeClass("bi-list") : 
+					$("#icon_sidebar").removeClass("bi-x-lg").addClass("bi-list");
+				
+                $('#sidebar').toggleClass('collapsed');
+                $('#main-content').toggleClass('collapsed');
+            });
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>
