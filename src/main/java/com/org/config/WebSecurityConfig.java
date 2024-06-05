@@ -2,6 +2,7 @@ package com.org.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,9 +34,11 @@ public class WebSecurityConfig {
                 authorizeRequests
 	                .requestMatchers("/Inventario/**").hasRole("Inventario")
 	                .requestMatchers("/Ventas/**").hasRole("Ventas")
+	                .requestMatchers(HttpMethod.POST, "/fetch/**", "/transaction/**").hasAnyRole("Inventario", "Ventas")
 	                .requestMatchers("/Login", "/").permitAll()
                     .anyRequest().authenticated()
             )
+            .csrf(csrf -> csrf.disable())
             .formLogin(formLogin -> 
                 formLogin
                     .loginPage("/Login")

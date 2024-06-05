@@ -19,4 +19,9 @@ public class FetchController {
 	public List<PRODUCTOS_ENTITY> getListaProductos(){
 		return fetchService.getListaProductos();
 	}
+	
+	@PostMapping(value="/fetch/listaCategorias", produces = {"application/json"})
+	public List<PRODUCTOS_ENTITY> getListaCategorias(){
+		return fetchService.getListaProductos();
+	}
 }

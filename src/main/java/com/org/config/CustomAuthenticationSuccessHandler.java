@@ -15,11 +15,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-        
+        String contextPath = request.getContextPath();
+   
         if (roles.contains("ROLE_Inventario")) {
-            response.sendRedirect("/Inventario/Home");
+            response.sendRedirect(contextPath + "/Inventario/Home");
         } else if (roles.contains("ROLE_Ventas")) {
-            response.sendRedirect("/Ventas/Home");
+            response.sendRedirect(contextPath +"/Ventas/Home");
         } else {
             response.sendRedirect("/accessDenied");
         }

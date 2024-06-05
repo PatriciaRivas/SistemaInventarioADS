@@ -76,52 +76,62 @@
 	    </div>
 	    <div class="main-content" id="main-content">
 	        <div class="container mt-5">
-		        <h1 class="mb-4">Registro de Productos</h1>
-		        <form>
-		            <div class="mb-3">
-		                <label for="nombre" class="form-label">Nombre</label>
-		                <input type="text" class="form-control" id="nombre" placeholder="Ingrese el nombre del producto" required>
-		            </div>
-		            <div class="mb-3">
-		                <label for="descripcion" class="form-label">Descripción</label>
-		                <textarea class="form-control" id="descripcion" rows="3" placeholder="Ingrese la descripción del producto" required></textarea>
-		            </div>
-		            <div class="mb-3">
-		                <label for="precio" class="form-label">Precio</label>
-		                <input type="number" step="0.01" class="form-control" id="precio" placeholder="Ingrese el precio del producto" required>
-		            </div>
-		            <div class="mb-3">
-		                <label for="existencia" class="form-label">Existencia</label>
-		                <input type="number" class="form-control" id="existencia" placeholder="Ingrese la cantidad en existencia" required>
-		            </div>
-		            <div class="mb-3">
-		                <label for="fecha_creado" class="form-label">Fecha de Creación</label>
-		                <input type="date" class="form-control" id="fecha_creado" required>
-		            </div>
-		            <div class="mb-3">
-		                <label for="fecha_modificado" class="form-label">Fecha de Modificación</label>
-		                <input type="date" class="form-control" id="fecha_modificado">
-		            </div>
-		            <div class="mb-3">
-		                <label for="estado" class="form-label">Estado</label>
-		                <select class="form-select" id="estado" required>
-		                    <option value="activo">Activo</option>
-		                    <option value="inactivo">Inactivo</option>
-		                </select>
-		            </div>
-		            <div class="mb-3">
-		                <label for="imagen" class="form-label">Imagen</label>
-		                <input type="file" class="form-control" id="imagen">
-		            </div>
-		            <div class="mb-3">
-		                <label for="categoria_id" class="form-label">Categoría</label>
-		                <select class="form-select" id="categoria_id" required>
-		                    <option value="" selected>Seleccione una categoría</option>
-		                    <!-- Las opciones deberían ser generadas dinámicamente desde la base de datos -->
-		                </select>
-		            </div>
-		            <button type="submit" class="btn btn-primary">Registrar Producto</button>
-		        </form>
+				<div class="row">
+					<div class="card col-4">
+					<div class="card-body">
+						<h5 class="mb-4">Registro de Productos</h5>
+				        <form id="frm_producto">
+				            <div class="mb-3">
+				                <label for="nombre" class="form-label">Nombre</label>
+				                <input type="text" class="form-control form-control-sm" id="nombre" name="nombre" placeholder="Ingrese el nombre del producto" required>
+				            </div>
+				            <div class="mb-3">
+				                <label for="descripcion" class="form-label">Descripción</label>
+				                <textarea class="form-control form-control-sm" id="descripcion" name="descripcion" rows="3" placeholder="Ingrese la descripción del producto" required></textarea>
+				            </div>
+				            <div class="mb-3">
+				                <label for="precio" class="form-label">Precio</label>
+				                <input type="number" step="0.01" class="form-control form-control-sm" id="precio" name="precio" placeholder="Ingrese el precio del producto" required>
+				            </div>
+				            <div class="mb-3">
+				                <label for="existencia" class="form-label">Existencia</label>
+				                <input type="number" class="form-control form-control-sm" id="existencia" name="existencia" placeholder="Ingrese la cantidad en existencia" required>
+				            </div>
+				            <div class="mb-3">
+				                <label for="estado" class="form-label">Estado</label>
+				                <select class="form-select form-select-sm" id="estado" name="estado" required>
+				                    <option value="1">Activo</option>
+				                    <option value="0">Inactivo</option>
+				                </select>
+				            </div>
+				            <div class="mb-3">
+				                <label for="categoria_id" class="form-label">Categoría</label>
+				                <select class="form-select form-select-sm" id="categoria_id" name="categoria" required>
+				                    <option value="" selected>Seleccione una categoría</option>
+									<option th:each="categoria : ${lista_categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
+				                </select>
+				            </div>
+				            <button id="btn_guardar_producto" type="button" class="btn btn-primary">Registrar Producto</button>
+				        </form>
+					</div>					
+				</div>	
+				<div class="col-8">
+					<table class="table table-bordered">
+			            <thead>
+			                <tr>
+			                    <th>ID</th>
+			                    <th>Nombre</th>
+			                    <th>Descripción</th>
+			                    <th>Precio</th>
+			                    <th>Existencia</th>
+			                    <th>Estado</th>
+			                </tr>
+			            </thead>
+			            <tbody id="productos-table">
+			            </tbody>
+			        </table>					
+				</div>	
+				</div>        
 		    </div>
 	    </div>
 	</div>
@@ -131,10 +141,73 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script th:inline="javascript">
 		 /*<![CDATA[*/
         
         $(document).ready(function () {
+			productos = /*[[${lista_productos}]]*/ 'default';
+			
+			const renderProductos = () => {
+                const tbody = $('#productos-table');
+                tbody.empty();
+                productos.forEach(producto => {
+                    tbody.append(`
+                        <tr data-id="${producto.id}">
+                            <td>${producto.id}</td>
+                            <td>${producto.nombre}</td>
+                            <td>${producto.descripcion}</td>
+                            <td>${producto.precio}</td>
+                            <td>${producto.existencia}</td>
+                            <td>${producto.estado}</td>
+                        </tr>
+                    `);
+                });
+        	};
+        	renderProductos();
+        	
+        	$("#btn_guardar_producto").click(function(){
+				if($("#frm_producto").valid()){
+					let form = $("#frm_producto")[0];
+					let formData = new FormData(form);
+					
+					$.ajax({
+	                    beforeSend: function () {
+	                        $("button").each(function () {
+	                            $(this).prop('disabled', true);
+	                        });
+	                        Swal.fire({
+	                            title: 'Guardando...',
+	                            allowOutsideClick: false,
+	                            showConfirmButton: false,
+	                            willOpen: () => {
+	                                Swal.showLoading()
+	                            },
+	                        });
+	                    },
+	                    url: "/SistemaInventarioADS/transaction/guardarProducto",
+	                    method: "POST",
+	                    data: formData,
+	                    processData: false,
+	                    contentType: false
+	                }).done(function (data) {
+	                    if (data == "done") {
+	                        Swal.fire({
+	                            title: "Guardado!",
+	                            icon: "success"
+	                        }).then(function () {
+	                            location.reload();
+	                        })
+	                    }
+	                }).fail(function () {
+	                    Swal.close();
+	                }).always(function () {
+	                    $("button").prop("disabled", false);
+	                });
+				}
+				
+			});
 			
             $('#sidebarToggle').on('click', function () {
 				
@@ -148,6 +221,51 @@
                 $('#sidebar').toggleClass('collapsed');
                 $('#main-content').toggleClass('collapsed');
             });
+            
+            $.validator.setDefaults({
+	            errorElement: 'label',
+	            errorClass: 'invalid-feedback',
+	            validClass: 'success',
+	            errorPlacement: function (error, element) {
+	                let errorSelector = "#validate_" + $(element).attr("name");
+	                let $element = $(errorSelector);
+	
+	                if ($element.html() != null) {
+	                    $element.html(error.html())
+	                    $element.addClass("d-block")
+	                } else {
+	                    error.insertAfter(element);
+	                }
+	            },
+	            highlight: function (element, errorClass) {
+	                $(element).addClass("is-invalid");
+	                $(element).removeClass(errorClass);
+	            },
+	            unhighlight: function (element, errorClass, validClass) {
+	                $(element).removeClass("is-invalid");
+	                $(element).removeClass(errorClass);
+	
+	            }
+	        });
+	
+	        $("#frm_producto").validate({
+	            rules: {
+	                nombre: { required: true },
+	                descripcion: { required: true },
+	                precio: { required: true },
+					existencia: { required: true },
+					estado: { required: true },
+					categoria: { required: true }
+	            },
+	            messages: {
+	                nombre: { required: "Campo requerido" },
+	                descripcion: { required: "Campo requerido" },
+	                precio: { required: "Campo requerido" },
+					existencia: { required: "Campo requerido" },
+					estado: { required: "Campo requerido" },
+					categoria: { required: "Campo requerido" }
+	            }
+	        });
         });
         /*]]>*/
     </script>
