@@ -22,6 +22,7 @@ public class AppController {
 	
 	@GetMapping("/Inventario/Inventario")
 	public String getVistaInventario(HttpServletRequest request, Model model) {
+		model.addAttribute("lista_productos", fetchService.getListaProductos());
 		return "/Inventario/Inventario";
 	}
 	

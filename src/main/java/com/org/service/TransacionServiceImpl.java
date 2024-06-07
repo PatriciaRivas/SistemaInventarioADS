@@ -9,6 +9,11 @@ import com.org.inventario.dao.CATEGORIA_DAO;
 import com.org.inventario.dao.PRODUCTOS_DAO;
 import com.org.inventario.entity.CATEGORIA_ENTITY;
 import com.org.inventario.entity.PRODUCTOS_ENTITY;
+import com.org.inventario.entity.UPDATEPRODUCTCOLUMN_ENTITY;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.StoredProcedureQuery;
 
 @Service
 public class TransacionServiceImpl implements TransactionService {
@@ -18,6 +23,9 @@ public class TransacionServiceImpl implements TransactionService {
 	
 	@Autowired
 	private PRODUCTOS_DAO productosDao;
+	
+	@PersistenceContext(unitName = "inventario")
+	private EntityManager inventarioEntityManager;
 
 	@Override
 	public String guardarCategoria(String nombre, String descripcion, Boolean habilitado) {
@@ -44,6 +52,15 @@ public class TransacionServiceImpl implements TransactionService {
 		
 		productosDao.save(producto);
 		return "done";
+	}
+
+	@Override
+	public UPDATEPRODUCTCOLUMN_ENTITY mantenimientoProducto(String productoId, String column, String valor) {
+		StoredProcedureQuery sp= inventarioEntityManager.createNamedStoredProcedureQuery("UpdateProductColumn");
+		sp.setParameter("id", productoId);
+		sp.setParameter("columnName", column);
+		sp.setParameter("valor", valor);
+		return (UPDATEPRODUCTCOLUMN_ENTITY) sp.getSingleResult();
 	}
 
 }
