@@ -41,10 +41,11 @@ public class AppController {
 	
 	@GetMapping("/Ventas/Home")
 	public String getVistaVentaProductos(HttpServletRequest request, Model model) {
+		model.addAttribute("lista_productos", fetchService.getListaProductos());
 		return "/Ventas/VentaProductos";
 	}
 	
-	@GetMapping("/Login")
+	@GetMapping({"/Login","/logout"})
 	public String returnLogin(HttpServletRequest request, Model model) {
 		return "/Login";
 	}
